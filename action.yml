@@ -1,0 +1,9 @@
+name: "Hugo Deploy GitHub Pages"
+author: "benmatselby"
+description: "Build and deploy a hugo site to GitHub Pages"
+runs:
+  using: "docker"
+  image: "Dockerfile"
+branding:
+  icon: "target"
+  color: "purple"
