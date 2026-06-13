@@ -1,1 +1,15 @@
-# benmatselby-hugo-deploy-gh-pages
+# benmatselby/hugo-deploy-gh-pages
+
+Build and deploy a hugo site to GitHub Pages
+
+Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/benmatselby/hugo-deploy-gh-pages](https://github.com/benmatselby/hugo-deploy-gh-pages).
+
+## Versions
+
+| Version | Tag | Upstream commit |
+|---------|-----|-----------------|
+| v2.2.0 | [`v2.2.0`](https://github.com/chainguard-actions/benmatselby-hugo-deploy-gh-pages/tree/v2.2.0) | [`8478fdf`](https://github.com/benmatselby/hugo-deploy-gh-pages/commit/8478fdff05066526e4ead4d92409df9356174a78) |
+
+## Privacy
+
+This Action contacts Chainguard's licensing server to verify authorization. Connection metadata (IP address, GitHub repository identifier, timestamp, and any metadata encoded in the auth token) is transmitted to Chainguard, Inc. even if authorization is denied in accordance with our [Privacy Notice](https://www.chainguard.dev/legal/privacy-notice)
