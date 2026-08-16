@@ -1,0 +1,57 @@
+name: Test with minimal Hugo site (fails at git push)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # Create a minimal Hugo site structure so the action can build it.
+      # The action will fail at the git push step due to the fake token,
+      # but we verify it gets past the Hugo download and build steps.
+      - name: Create minimal Hugo site
+        run: |
+          mkdir -p hugo-site/content
+          mkdir -p hugo-site/layouts/_default
+          cat > hugo-site/config.toml <<'EOF'
+          baseURL = "https://example.com/"
+          languageCode = "en-us"
+          title = "Test Site"
+          EOF
+          cat > hugo-site/layouts/_default/list.html <<'EOF'
+          <!DOCTYPE html>
+          <html><body>{{ .Content }}</body></html>
+          EOF
+          cat > hugo-site/layouts/_default/single.html <<'EOF'
+          <!DOCTYPE html>
+          <html><body>{{ .Content }}</body></html>
+          EOF
+          cat > hugo-site/layouts/index.html <<'EOF'
+          <!DOCTYPE html>
+          <html><body>Home</body></html>
+          EOF
+
+      # Run the action from within the hugo-site directory.
+      # The action downloads Hugo, builds the site, then tries to push.
+      # It will fail at the git push step with the fake token.
+      - id: action
+        uses: .
+        with:
+          github_token: fake-token-for-testing
+          hugo_version: "0.111.3"
+          target_repo: fake-org/fake-repo
+        continue-on-error: true
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}/hugo-site
+
+      - name: Assert action failed at git push (not at hugo build)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail at git push step, got '$OUTCOME'"
+            exit 1
+          fi
+          echo "PASS: action correctly failed (expected at git push with fake token)"

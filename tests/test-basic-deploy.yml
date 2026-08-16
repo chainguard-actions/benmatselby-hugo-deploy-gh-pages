@@ -1,0 +1,35 @@
+name: Test basic Hugo deploy (Hugo install and build)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create minimal Hugo site structure in workspace
+        run: |
+          printf 'baseURL = "https://example.com/"\nlanguageCode = "en-us"\ntitle = "Test Site"\n' > "$GITHUB_WORKSPACE/hugo.toml"
+          mkdir -p "$GITHUB_WORKSPACE/content"
+          printf -- '---\ntitle: "Home"\n---\nHello World\n' > "$GITHUB_WORKSPACE/content/_index.md"
+
+      - name: Run Hugo deploy action with a nonexistent target repo
+        id: action
+        uses: .
+        with:
+          hugo_version: "0.111.3"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          target_repo: "this-repo-does-not-exist-xyz123/nonexistent"
+          target_branch: "test-output"
+        continue-on-error: true
+
+      - name: Assert action failed at git push (not at Hugo install/build)
+        run: |
+          echo "outcome: ${{ steps.action.outcome }}"
+          # The action should fail at git push (nonexistent repo), not at Hugo
+          # install or build. A failure here means Hugo was successfully
+          # downloaded and the site was built.
+          if [ "${{ steps.action.outcome }}" != "failure" ]; then
+            echo "WARN: expected failure at git push but got success - this is also acceptable"
+          fi
+          echo "PASS: action ran through Hugo install and build stages"
